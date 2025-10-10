@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import './AlertsTable.css';
+import { formatDate, toTimestamp, formatSeverity } from '../../utils/formatters';
 
 /**
  * @typedef {'Time'|'Severity'|'Source'|'Resource'|'Status'} ColumnKey
@@ -50,13 +51,13 @@ export default function AlertsTable({ alerts = [], loading = false, error = null
       const mul = dir === 'asc' ? 1 : -1;
       switch (key) {
         case 'Time': {
-          const ta = toTs(a.time);
-          const tb = toTs(b.time);
+          const ta = toTimestamp(a.time);
+          const tb = toTimestamp(b.time);
           return (ta - tb) * mul;
         }
         case 'Severity': {
-          const wa = severityWeight(a.severity);
-          const wb = severityWeight(b.severity);
+          const wa = formatSeverity(a.severity).weight;
+          const wb = formatSeverity(b.severity).weight;
           return (wa - wb) * mul;
         }
         case 'Source':
@@ -112,24 +113,27 @@ export default function AlertsTable({ alerts = [], loading = false, error = null
               </tr>
             </thead>
             <tbody>
-              {sorted.map((row) => (
-                <tr
-                  key={row.id ?? `${row.time}-${row.resource}-${row.source}`}
-                  className={`row-sev-${sevClass(row.severity)}`}
-                  onClick={() => onRowClick && onRowClick(row)}
-                  tabIndex={0}
-                >
-                  <td><time dateTime={isoTime(row.time)}>{fmtTime(row.time)}</time></td>
-                  <td>
-                    <span className={`sev-badge sev-${sevClass(row.severity)}`}>
-                      {String(row.severity || 'info').toUpperCase()}
-                    </span>
-                  </td>
-                  <td>{row.source || '—'}</td>
-                  <td className="cell-resource" title={row.resource || ''}>{row.resource || '—'}</td>
-                  <td>{row.status || 'open'}</td>
-                </tr>
-              ))}
+              {sorted.map((row) => {
+                const sev = formatSeverity(row.severity);
+                return (
+                  <tr
+                    key={row.id ?? `${row.time}-${row.resource}-${row.source}`}
+                    className={`row-sev-${sev.className}`}
+                    onClick={() => onRowClick && onRowClick(row)}
+                    tabIndex={0}
+                  >
+                    <td><time dateTime={isoTime(row.time)}>{formatDate(row.time)}</time></td>
+                    <td>
+                      <span className={`sev-badge sev-${sev.className}`}>
+                        {sev.text}
+                      </span>
+                    </td>
+                    <td>{row.source || '—'}</td>
+                    <td className="cell-resource" title={row.resource || ''}>{row.resource || '—'}</td>
+                    <td>{row.status || 'open'}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -138,47 +142,13 @@ export default function AlertsTable({ alerts = [], loading = false, error = null
   );
 }
 
-function toTs(v) {
-  if (v instanceof Date) return v.getTime();
-  if (typeof v === 'number') return v;
-  if (typeof v === 'string') {
-    const t = Date.parse(v);
-    if (!Number.isNaN(t)) return t;
-  }
-  return 0;
-}
-
 function isoTime(v) {
-  const t = toTs(v);
+  const t = toTimestamp(v);
   try {
     return new Date(t).toISOString();
   } catch {
     return '';
   }
-}
-
-function fmtTime(v) {
-  const t = toTs(v);
-  try {
-    return new Intl.DateTimeFormat(undefined, { dateStyle: 'short', timeStyle: 'short' }).format(new Date(t));
-  } catch {
-    return String(v ?? '');
-  }
-}
-
-function severityWeight(sev) {
-  const s = String(sev || '').toLowerCase();
-  if (s === 'critical') return 3;
-  if (s === 'warning') return 2;
-  if (s === 'info') return 1;
-  return 0;
-}
-
-function sevClass(sev) {
-  const s = String(sev || '').toLowerCase();
-  if (s === 'critical') return 'critical';
-  if (s === 'warning') return 'warning';
-  return 'info';
 }
 
 function str(v) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import './OverviewCards.css';
+import { formatNumber } from '../../utils/formatters';
 
 /**
  * PUBLIC_INTERFACE
@@ -103,10 +104,4 @@ function accentClass(accent) {
   }
 }
 
-function formatNumber(n) {
-  try {
-    return new Intl.NumberFormat().format(n);
-  } catch {
-    return String(n);
-  }
-}
+

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import './NotificationDrawer.css';
+import { formatSeverity, formatTimeAgo } from '../../utils/formatters';
 
 /**
  * @typedef {{ id: string|number, title: string, severity?: 'info'|'warning'|'critical', timestamp?: string, description?: string }} NotificationItem
@@ -74,35 +75,29 @@ export default function NotificationDrawer({ isOpen, onClose, notifications = []
               <p className="text-muted">No notifications</p>
             </div>
           )}
-          {notifications.map((n) => (
-            <button
-              key={n.id}
-              role="listitem"
-              className={`notif ${severityClass(n.severity)}`}
-              onClick={() => onSelectNotification && onSelectNotification(n)}
-              aria-label={`${n.title}${n.severity ? `, ${n.severity}` : ''}${n.timestamp ? `, ${n.timestamp}` : ''}`}
-            >
-              <div className="notif-top">
-                <span className="pill">{(n.severity || 'info').toUpperCase()}</span>
-                {n.timestamp && <time className="timestamp">{n.timestamp}</time>}
-              </div>
-              <div className="notif-title">{n.title}</div>
-              {n.description && <div className="notif-desc">{n.description}</div>}
-            </button>
-          ))}
+          {notifications.map((n) => {
+            const sev = formatSeverity(n.severity);
+            return (
+              <button
+                key={n.id}
+                role="listitem"
+                className={`notif sev-${sev.className}`}
+                onClick={() => onSelectNotification && onSelectNotification(n)}
+                aria-label={`${n.title}${n.severity ? `, ${sev.text}` : ''}${n.timestamp ? `, ${formatTimeAgo(n.timestamp)}` : ''}`}
+              >
+                <div className="notif-top">
+                  <span className="pill">{sev.text}</span>
+                  {n.timestamp && <time className="timestamp">{formatTimeAgo(n.timestamp)}</time>}
+                </div>
+                <div className="notif-title">{n.title}</div>
+                {n.description && <div className="notif-desc">{n.description}</div>}
+              </button>
+            );
+          })}
         </div>
       </aside>
     </div>
   );
 }
 
-function severityClass(sev) {
-  switch (sev) {
-    case 'critical':
-      return 'sev-critical';
-    case 'warning':
-      return 'sev-warning';
-    default:
-      return 'sev-info';
-  }
-}
+

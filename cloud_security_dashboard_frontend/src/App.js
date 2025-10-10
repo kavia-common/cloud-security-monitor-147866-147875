@@ -24,6 +24,7 @@ import './components/Modals/AlertDetailsModal.css';
 // Data hooks
 import useApi from './hooks/useApi';
 import useWebSocket from './hooks/useWebSocket';
+import './types/models'; // bring in JSDoc typedefs for editor tooling
 
 /**
  * PUBLIC_INTERFACE

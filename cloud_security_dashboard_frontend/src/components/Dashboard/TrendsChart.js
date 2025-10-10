@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import './TrendsChart.css';
+import '../../types/models'; // Import for JSDoc typedef visibility
 
 /**
  * PUBLIC_INTERFACE
