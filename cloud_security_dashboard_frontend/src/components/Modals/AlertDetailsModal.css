@@ -1,0 +1,137 @@
+.modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(1px);
+  animation: backdropIn var(--transition-base);
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+.modal-dialog {
+  position: relative;
+  width: 720px;
+  max-width: 100%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(8px);
+  animation: dialogIn var(--transition-base);
+}
+
+@keyframes dialogIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.modal-close {
+  border: 1px solid var(--color-border);
+}
+
+.modal-body {
+  padding: var(--space-6);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.modal-desc {
+  margin-top: -6px;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+  .modal-header, .modal-body, .modal-footer {
+    padding: var(--space-4);
+  }
+}
+
+.modal-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.modal-label {
+  color: var(--color-muted);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.modal-value {
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modal-details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-pre {
+  margin: var(--space-3) 0 0;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  overflow: auto;
+  max-height: 300px;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-6);
+}
+
+.modal-actions {
+  display: inline-flex;
+  gap: var(--space-3);
+}
