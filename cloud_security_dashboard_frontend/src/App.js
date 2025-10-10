@@ -9,6 +9,17 @@ import './components/Layout/Header.css';
 import NotificationDrawer from './components/Layout/NotificationDrawer';
 import './components/Layout/NotificationDrawer.css';
 
+// Dashboard components
+import OverviewCards from './components/Dashboard/OverviewCards';
+import './components/Dashboard/OverviewCards.css';
+import TrendsChart from './components/Dashboard/TrendsChart';
+import './components/Dashboard/TrendsChart.css';
+import AlertsTable from './components/Dashboard/AlertsTable';
+import './components/Dashboard/AlertsTable.css';
+
+// Data hooks
+import useApi from './hooks/useApi';
+
 /**
  * PUBLIC_INTERFACE
  * App - Root shell for Cloud Security Dashboard with header, sidebar, and notification drawer.
@@ -79,12 +90,16 @@ function App() {
         />
 
         <main style={{ padding: '24px', background: 'var(--color-bg)', flex: 1 }}>
-          <div className="card">
-            <h2 style={{ marginBottom: 8 }}>
-              {active.charAt(0).toUpperCase() + active.slice(1)}
-            </h2>
-            <p className="text-muted">This is a placeholder for the {active} section.</p>
-          </div>
+          {active === 'overview' ? (
+            <DashboardOverview />
+          ) : (
+            <div className="card">
+              <h2 style={{ marginBottom: 8 }}>
+                {active.charAt(0).toUpperCase() + active.slice(1)}
+              </h2>
+              <p className="text-muted">This is a placeholder for the {active} section.</p>
+            </div>
+          )}
         </main>
       </div>
 
@@ -99,3 +114,60 @@ function App() {
 }
 
 export default App;
+
+/**
+ * DashboardOverview
+ * Composes OverviewCards, TrendsChart (placeholder), and AlertsTable.
+ * Fetches summary and recent alerts via useApi.
+ */
+function DashboardOverview() {
+  // Summary data
+  const { data: summary, loading: loadingSummary, error: errorSummary } = useApi('/api/alerts/summary');
+
+  // Recent alerts
+  const { data: recent, loading: loadingAlerts, error: errorAlerts } = useApi('/api/alerts?limit=50');
+
+  // Normalize alerts array for the table
+  const alerts = Array.isArray(recent) ? recent.map((a, idx) => ({
+    id: a.id ?? idx,
+    time: a.time ?? a.timestamp ?? a.createdAt ?? a.ts ?? Date.now(),
+    severity: a.severity ?? a.level ?? 'info',
+    source: a.source ?? a.provider ?? a.origin ?? '',
+    resource: a.resource ?? a.entity ?? a.asset ?? '',
+    status: a.status ?? a.state ?? 'open',
+    ...a,
+  })) : [];
+
+  // Placeholder trend data from alerts (e.g., spread across 24 points).
+  const trendData = useMemo(() => {
+    if (!alerts || alerts.length === 0) return [];
+    const now = Date.now();
+    const buckets = 24;
+    const size = 60 * 60 * 1000; // 1 hour
+    const counts = Array.from({ length: buckets }).map((_, i) => {
+      const end = now - (buckets - 1 - i) * size;
+      const start = end - size;
+      const c = alerts.filter(a => {
+        const t = (new Date(a.time)).getTime ? (new Date(a.time)).getTime() : a.time;
+        return t >= start && t < end;
+      }).length;
+      return { ts: end, value: c };
+    });
+    return counts;
+  }, [alerts]);
+
+  const handleRowClick = (alert) => {
+    // Emit to parent later; for now log
+    // In the future, this can open a details drawer or modal
+    // eslint-disable-next-line no-console
+    console.log('Row clicked:', alert);
+  };
+
+  return (
+    <div className="container" style={{ display: 'grid', gap: '16px' }}>
+      <OverviewCards summary={summary || null} loading={loadingSummary} error={errorSummary} />
+      <TrendsChart data={trendData} loading={loadingAlerts} />
+      <AlertsTable alerts={alerts} loading={loadingAlerts} error={errorAlerts} onRowClick={handleRowClick} />
+    </div>
+  );
+}

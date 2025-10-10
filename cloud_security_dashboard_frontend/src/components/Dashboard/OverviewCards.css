@@ -1,0 +1,96 @@
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+@media (max-width: 1100px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.overview-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  padding: var(--space-6);
+  text-align: left;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border-strong);
+}
+
+.overview-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.overview-emoji {
+  font-size: 18px;
+}
+
+.overview-label {
+  color: var(--color-muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.overview-value {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.accent-primary {
+  background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(255,255,255,1) 100%);
+}
+
+.accent-secondary {
+  background: linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(255,255,255,1) 100%);
+}
+
+.accent-error {
+  background: linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(255,255,255,1) 100%);
+}
+
+.accent-muted {
+  background: var(--color-surface);
+}
+
+/* Loading skeleton */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.03), rgba(255,255,255,0.45), rgba(0,0,0,0.03));
+  transform: translateX(-100%);
+  animation: shimmer 1.4s infinite;
+  border-radius: inherit;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+.overview-error,
+.overview-empty {
+  background: var(--color-surface);
+}
